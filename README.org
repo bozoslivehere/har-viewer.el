@@ -1,0 +1,17 @@
+#+title: har-viewer.el
+#+author: Gregory Newman
+#+email: bozoslivehere@protonmail.com
+
+har-viewer.el is a utility to display HAR (HTTP Archive) files in Emacs.
+
+* Usage
+
+- =har-view= views the current buffer (if a HAR file) in HAR Viewer mode.
+- =har-display-request-headers= displays the request and response headers.
+- =har-display-response-body= displays the response body.  If a major-mode is available for its correspond mime-type, it will be activated.
+- =har-display-request-body= displays the request body.  If a major-mode is available for its correspond mime-type, it will be activated.
+
+
+** Options
+
+=(setq har-beautify-content-buffers t)= will also beautify the contents of the request/response body buffers.  Requires =web-content.el=.
