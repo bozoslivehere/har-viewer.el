@@ -29,10 +29,6 @@
   (define-key har-viewer-mode-map (kbd "C-c R") 'har-display-request-body)
   (define-key har-viewer-mode-map (kbd "C-c r") 'har-display-response-body))
 
-
-
-
-
 (defun harmode-parse-url (url)
   "Parse a blob URL, treating it as a blob plus a regular URL."
   (if (string-prefix-p "blob:" url)
@@ -115,13 +111,13 @@
                          (push response-body har-response-bodies)
                          (push request-post-data har-request-bodies)
                          (list entry-id (vector protocol
-                                           method
-                                           domain
-                                           path
-                                           status
-                                           content-type
-                                           (format "%s" size)
-                                           (format "%.0f ms" time)))))
+                                                method
+                                                domain
+                                                path
+                                                status
+                                                content-type
+                                                (format "%s" size)
+                                                (format "%.0f ms" time)))))
                      entries)))
         (setq har-entries-headers (reverse har-entries-headers)) ; Reverse to maintain order
         (setq har-response-bodies (reverse har-response-bodies))
