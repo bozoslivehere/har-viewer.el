@@ -1,18 +1,45 @@
-;;; har-viewer.el --- HAR file viewer/major mode -*- lexical-binding: t -*-
-;;;
-;;; Author: Gregory Newman <bozoslivehere@protonmail.com>
-;;; Keywords: HAR HTTP Archive
-;;;
+;;; har-viewer.el --- Major mode for viewing HTTP Archive (HAR) files -*- lexical-binding: t -*-
+
+;; Copyright (C) 2024 Gregory Newman
+
+;; Author: Gregory Newman <bozoslivehere@protonmail.com>
+;; Version: 0.1.0
+;; Package-Requires: ((emacs "26.1"))
+;; Keywords: tools, http, network
+;; URL: https://github.com/gregnewman/har-viewer.el
+
+;; This file is not part of GNU Emacs.
+
 ;;; Commentary:
-;;; For viewing HAR files.  Easily extract requests and responses.
-;;; Adds a command to open the HAR viewer when files with the extension
-;;; .har are open in the current buffer: C-c v
+
+;; A major mode for viewing HTTP Archive (HAR) files.  Provides a
+;; tabulated list of all captured requests and responses with commands
+;; to inspect headers, request/response bodies, and copy entries as
+;; cURL commands.
+;;
+;; Usage:
+;; Open a .har file and press C-c v to launch the HAR viewer.
+;;
+;; Keybindings in `har-viewer-mode':
+;;
+;;   RET    Display request and response headers
+;;   C-c r  Display response body
+;;   C-c R  Display request body
+;;   C-c c  Copy entry as a cURL command (also: yc in evil normal state)
+;;   C-c n  Narrow list by URL regex
+;;
+;; Optional integrations:
+;;
+;;   restclient  -- header buffers use restclient-mode when available
+;;   web-beautify -- body buffers are auto-formatted when available
+;;   evil         -- adds RET and yc normal-state bindings when available
 
 ;;; Code:
-(require 'evil)
+
 (require 'json)
 (require 'url-parse)
 
+;;;###autoload
 (define-derived-mode har-viewer-mode tabulated-list-mode "HAR Viewer"
   "Major mode for viewing HTTP Archive (HAR) files."
   (setq tabulated-list-format [("Protocol" 8 t)
