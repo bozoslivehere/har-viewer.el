@@ -1,17 +1,122 @@
 #+title: har-viewer.el
 #+author: Gregory Newman
 #+email: bozoslivehere@protonmail.com
+#+language: en
 
-har-viewer.el is a utility to display HAR (HTTP Archive) files in Emacs.
+A major mode for viewing HTTP Archive (HAR) files in Emacs.  HAR
+files capture browser network activity and are exported from tools
+such as browser DevTools, Burp Suite, Charles Proxy, and mitmproxy.
+~har-viewer~ renders the request list as a sortable table and provides
+commands to inspect headers, bodies, and copy requests as cURL
+commands.
+
+* Installation
+
+** From MELPA
+
+#+begin_src emacs-lisp
+(package-install 'har-viewer)
+#+end_src
+
+Or with ~use-package~:
+
+#+begin_src emacs-lisp
+(use-package har-viewer)
+#+end_src
+
+** Manual
+
+Clone the repository and add it to your load path:
+
+#+begin_src emacs-lisp
+(add-to-list 'load-path "/path/to/har-viewer.el")
+(require 'har-viewer)
+#+end_src
 
 * Usage
 
-- =har-view= views the current buffer (if a HAR file) in HAR Viewer mode.
-- =har-display-request-headers= displays the request and response headers.
-- =har-display-response-body= displays the response body.  If a major-mode is available for its correspond mime-type, it will be activated.
-- =har-display-request-body= displays the request body.  If a major-mode is available for its correspond mime-type, it will be activated.
+Open a =.har= file in Emacs.  The package automatically binds =C-c v=
+in any =.har= buffer.  Press it to open the viewer:
 
+: M-x har-view   (or C-c v from a .har file buffer)
 
-** Options
+The viewer opens in a separate =*HAR Viewer*= buffer showing all
+requests in a tabulated list.  A =*HAR Details*= pane below the list
+shows header and body output.
 
-=(setq har-beautify-content-buffers t)= will also beautify the contents of the request/response body buffers.  Requires =web-content.el=.
+* Keybindings
+
+| Key     | Command                     | Description                       |
+|---------+-----------------------------+-----------------------------------|
+| =RET=   | ~har-display-headers~       | Show request and response headers |
+| =C-c r= | ~har-display-response-body~ | Show response body                |
+| =C-c R= | ~har-display-request-body~  | Show request body                 |
+| =C-c c= | ~har-copy-as-curl~          | Copy entry as a cURL command      |
+| =C-c n= | ~har-narrow-to-regex~       | Filter list by URL regex          |
+
+With [[https://github.com/emacs-evil/evil][evil-mode]] the following normal-state bindings are also available:
+
+| Key   | Description                       |
+|-------+-----------------------------------|
+| =RET= | Show request and response headers |
+| =yc=  | Copy entry as a cURL command      |
+
+* Copy as cURL
+
+Pressing =C-c c= (or =yc= in evil normal state) copies a shell-ready
+cURL invocation for the entry at point to the kill ring.  The command
+includes all request headers and, where present, the request body:
+
+#+begin_example
+curl -X 'POST' \
+  'https://api.example.com/v1/items' \
+  -H 'Content-Type: application/json' \
+  -H 'Authorization: Bearer eyJ...' \
+  --data-raw '{"name":"widget"}'
+#+end_example
+
+Single quotes within header values or body text are shell-escaped
+automatically.
+
+* Filtering
+
+=C-c n= prompts for a regular expression and narrows the list to
+entries whose domain + path match it.  Call the command again with a
+new pattern to change the filter, or with an empty string to reset.
+
+* Configuration
+
+** Auto-format body buffers
+
+Install [[https://github.com/yasuyk/web-beautify][web-beautify]] and set:
+
+#+begin_src emacs-lisp
+(setq har-viewer-beautify-bodies t)
+#+end_src
+
+Response and request body buffers will then be auto-formatted
+according to their content type (JSON, HTML, CSS, JavaScript).
+Requires Node.js and the =js-beautify= npm package.
+
+** Header syntax highlighting
+
+Install [[https://github.com/pashky/restclient.el][restclient]] to have header buffers opened in
+~restclient-mode~ for syntax highlighting.  No configuration is
+required; the mode is activated automatically when the package is
+present.
+
+* Dependencies
+
+| Package      | Required | Notes                                     |
+|--------------+----------+-------------------------------------------|
+| Emacs 26.1+  | Yes      | Built-ins ~json~ and ~url-parse~ are used |
+| evil         | No       | Adds normal-state bindings when loaded    |
+| restclient   | No       | Header syntax highlighting                |
+| web-beautify | No       | Body auto-formatting (requires Node.js)   |
+
+* License
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or (at
+your option) any later version.
