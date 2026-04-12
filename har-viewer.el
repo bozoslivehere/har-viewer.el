@@ -39,6 +39,12 @@
 (require 'json)
 (require 'url-parse)
 
+(declare-function evil-define-key     "evil-core")
+(declare-function restclient-mode     "restclient")
+(declare-function web-beautify-js-buffer  "web-beautify")
+(declare-function web-beautify-html-buffer "web-beautify")
+(declare-function web-beautify-css-buffer  "web-beautify")
+
 ;;;###autoload
 (define-derived-mode har-viewer-mode tabulated-list-mode "HAR Viewer"
   "Major mode for viewing HTTP Archive (HAR) files."
