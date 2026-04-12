@@ -348,7 +348,7 @@ filter can be changed or cleared by calling this command again."
 
 ;;;###autoload
 (defun har-viewer--activate-for-file ()
-  "Bind C-c v to `har-view' when the current file has a .har extension."
+  "Bind `har-view' locally when the current buffer visits a .har file."
   (when (and (buffer-file-name)
              (string-match-p "\\.har\\'" (buffer-file-name)))
     (local-set-key (kbd "C-c v") #'har-view)))
