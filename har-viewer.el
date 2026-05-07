@@ -87,6 +87,11 @@
 
 ;;; Configuration
 
+(defgroup har-viewer nil
+  "Major mode for viewing HTTP Archive (HAR) files."
+  :group 'tools
+  :prefix "har-viewer-")
+
 (defvar har-viewer-beautify-bodies nil
   "When non-nil, auto-format body buffers using `web-beautify' if available.")
 
@@ -348,6 +353,7 @@ filter can be changed or cleared by calling this command again."
 (define-minor-mode har-viewer-minor-mode
   "Minor mode that provides \\[har-viewer-view] in .har file buffers."
   :lighter nil
+  :group 'har-viewer
   :keymap (let ((map (make-sparse-keymap)))
             (define-key map (kbd "C-c C-v") #'har-viewer-view)
             map))
@@ -361,7 +367,8 @@ filter can be changed or cleared by calling this command again."
 ;;;###autoload
 (define-globalized-minor-mode har-viewer-global-minor-mode
   har-viewer-minor-mode
-  har-viewer-minor-mode--maybe-enable)
+  har-viewer-minor-mode--maybe-enable
+  :group 'har-viewer)
 
 (provide 'har-viewer)
 ;;; har-viewer.el ends here
