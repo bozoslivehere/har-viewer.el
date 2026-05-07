@@ -18,15 +18,17 @@
 ;; cURL commands.
 ;;
 ;; Usage:
-;; Open a .har file and press C-c v to launch the HAR viewer.
+;; Enable `har-viewer-global-minor-mode' so that visiting any .har file
+;; automatically binds C-c C-v to `har-viewer-view'.  Alternatively, call
+;; `har-viewer-view' directly from a buffer containing HAR JSON.
 ;;
 ;; Keybindings in `har-viewer-mode':
 ;;
-;;   RET    Display request and response headers
-;;   C-c r  Display response body
-;;   C-c R  Display request body
-;;   C-c c  Copy entry as a cURL command (also: yc in evil normal state)
-;;   C-c n  Narrow list by URL regex
+;;   RET        Display request and response headers
+;;   C-c C-r    Display response body
+;;   C-c C-p    Display request body
+;;   C-c C-c    Copy entry as a cURL command (also: yc in evil normal state)
+;;   C-c C-n    Narrow list by URL regex
 ;;
 ;; Optional integrations:
 ;;
@@ -58,11 +60,15 @@
                                ("Time" 10 t)])
   (setq tabulated-list-padding 2)
   (tabulated-list-init-header)
-  (define-key har-viewer-mode-map (kbd "RET")   #'har-display-headers)
-  (define-key har-viewer-mode-map (kbd "C-c R") #'har-display-request-body)
-  (define-key har-viewer-mode-map (kbd "C-c c") #'har-copy-as-curl)
-  (define-key har-viewer-mode-map (kbd "C-c n") #'har-narrow-to-regex)
-  (define-key har-viewer-mode-map (kbd "C-c r") #'har-display-response-body))
+  (define-key har-viewer-mode-map (kbd "RET")   #'har-viewer-display-headers)
+  (define-key har-viewer-mode-map (kbd "C-c C-p") #'har-viewer-display-request-body)
+  (define-key har-viewer-mode-map (kbd "C-c C-c") #'har-viewer-copy-as-curl)
+  (define-key har-viewer-mode-map (kbd "C-c C-n") #'har-viewer-narrow-to-regex)
+  (define-key har-viewer-mode-map (kbd "C-c C-r") #'har-viewer-display-response-body)
+  (when (featurep 'evil)
+    (evil-define-key 'normal har-viewer-mode-map
+      (kbd "RET") #'har-viewer-display-headers
+      (kbd "yc")  #'har-viewer-copy-as-curl)))
 
 ;;; Buffer-local state
 
@@ -341,20 +347,24 @@ filter can be changed or cleared by calling this command again."
 
 ;;; Integration hooks
 
-(add-hook 'har-viewer-mode-hook #'har-viewer--setup-evil-keys)
+;;;###autoload
+(define-minor-mode har-viewer-minor-mode
+  "Minor mode that provides \\[har-viewer-view] in .har file buffers."
+  :lighter nil
+  :keymap (let ((map (make-sparse-keymap)))
+            (define-key map (kbd "C-c C-v") #'har-viewer-view)
+            map))
 
-(with-eval-after-load 'evil
-  (declare-function evil-define-key "evil-core"))
+(defun har-viewer-minor-mode--maybe-enable ()
+  "Enable `har-viewer-minor-mode' when visiting a .har file."
+  (when (and buffer-file-name
+             (string-match-p "\\.har\\'" buffer-file-name))
+    (har-viewer-minor-mode 1)))
 
 ;;;###autoload
-(defun har-viewer--activate-for-file ()
-  "Bind `har-view' locally when the current buffer visits a .har file."
-  (when (and (buffer-file-name)
-             (string-match-p "\\.har\\'" (buffer-file-name)))
-    (local-set-key (kbd "C-c v") #'har-view)))
-
-;;;###autoload
-(add-hook 'find-file-hook #'har-viewer--activate-for-file)
+(define-globalized-minor-mode har-viewer-global-minor-mode
+  har-viewer-minor-mode
+  har-viewer-minor-mode--maybe-enable)
 
 (provide 'har-viewer)
 ;;; har-viewer.el ends here
