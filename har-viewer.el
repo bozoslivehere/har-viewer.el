@@ -362,6 +362,8 @@ filter can be changed or cleared by calling this command again."
   "Enable `har-viewer-minor-mode' when visiting a .har file."
   (when (and buffer-file-name
              (string-match-p "\\.har\\'" buffer-file-name))
+    (when (boundp 'so-long-predicate)
+      (setq-local so-long-predicate #'ignore))
     (har-viewer-minor-mode 1)))
 
 ;;;###autoload
