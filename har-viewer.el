@@ -39,6 +39,7 @@
 ;;; Code:
 
 (require 'json)
+(require 'tabulated-list)
 (require 'url-parse)
 
 (declare-function evil-define-key     "evil-core")
@@ -90,6 +91,8 @@
   "When non-nil, auto-format body buffers using `web-beautify' if available.")
 
 ;;; Internal helpers
+
+(defvar cl-struct-url-tags)
 
 (defun har-viewer--parse-url (url)
   "Parse URL, handling blob: URLs by preserving the blob marker in the type."
@@ -205,17 +208,11 @@ the `web-beautify' package is loaded."
        (get-buffer-create "*HAR Details*")
        '((window-height . 0.3))))))
 
-(defun har-viewer--setup-evil-keys ()
-  "Add evil normal-state bindings for `har-viewer-mode' when evil is active."
-  (when (bound-and-true-p evil-mode)
-    (evil-define-key 'normal har-viewer-mode-map
-      (kbd "RET") #'har-display-headers
-      (kbd "yc")  #'har-copy-as-curl)))
 
 ;;; Commands
 
 ;;;###autoload
-(defun har-view ()
+(defun har-viewer-view ()
   "Open a HAR viewer for the current buffer."
   (interactive)
   (let* ((source-buf (current-buffer))
@@ -231,7 +228,7 @@ the `web-beautify' package is loaded."
       (tabulated-list-print t)
       (switch-to-buffer buf))))
 
-(defun har-display-headers ()
+(defun har-viewer-display-headers ()
   "Display the headers for the HAR entry at point."
   (interactive)
   (let* ((entry-id        (1- (tabulated-list-get-id)))
@@ -255,7 +252,7 @@ the `web-beautify' package is loaded."
       (when (fboundp 'restclient-mode) (restclient-mode))
       (select-window current-window))))
 
-(defun har-display-response-body ()
+(defun har-viewer-display-response-body ()
   "Display the response body for the HAR entry at point."
   (interactive)
   (let* ((entry-id     (1- (tabulated-list-get-id)))
@@ -274,7 +271,7 @@ the `web-beautify' package is loaded."
       (har-viewer--beautify mime-type)
       (select-window current-window))))
 
-(defun har-display-request-body ()
+(defun har-viewer-display-request-body ()
   "Display the request body for the HAR entry at point."
   (interactive)
   (let* ((entry-id     (1- (tabulated-list-get-id)))
@@ -293,7 +290,7 @@ the `web-beautify' package is loaded."
       (har-viewer--beautify mime-type)
       (select-window current-window))))
 
-(defun har-copy-as-curl ()
+(defun har-viewer-copy-as-curl ()
   "Copy the HAR entry at point as a cURL command to the kill ring."
   (interactive)
   (let* ((entry-id      (1- (tabulated-list-get-id)))
@@ -325,7 +322,7 @@ the `web-beautify' package is loaded."
     (kill-new (mapconcat #'identity parts " \\\n"))
     (message "Copied cURL command to kill ring.")))
 
-(defun har-narrow-to-regex (regex)
+(defun har-viewer-narrow-to-regex (regex)
   "Filter the HAR viewer to entries whose URL matches REGEX.
 The full entry list is re-read from the source buffer so the
 filter can be changed or cleared by calling this command again."
