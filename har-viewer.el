@@ -3,12 +3,28 @@
 ;; Copyright (C) 2024 Gregory Newman
 
 ;; Author: Gregory Newman <bozoslivehere@protonmail.com>
+;; Assisted-by: Claude:claude-sonnet-4.6
 ;; Version: 0.1.0
 ;; Package-Requires: ((emacs "26.1"))
 ;; Keywords: tools, http, network
-;; URL: https://github.com/gregnewman/har-viewer.el
+;; URL: https://github.com/bozoslivehere/har-viewer.el
 
 ;; This file is not part of GNU Emacs.
+
+;; SPDX-License-Identifier: GPL-3.0-or-later
+
+;; This program is free software: you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
+;;
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+;;
+;; You should have received a copy of the GNU General Public License
+;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ;;; Commentary:
 
