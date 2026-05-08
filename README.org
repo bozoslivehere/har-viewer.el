@@ -10,18 +10,26 @@ such as browser DevTools, Burp Suite, Charles Proxy, and mitmproxy.
 commands to inspect headers, bodies, and copy requests as cURL
 commands.
 
+#+attr_org: :width 800
+[[file:screenshots/main-interface.png]]
+
 * Installation
 
-** From MELPA
+** TODO From MELPA
+
+Note: this is pending recipe approval as of this commit.
 
 #+begin_src emacs-lisp
 (package-install 'har-viewer)
+(har-viewer-global-minor-mode 1)
 #+end_src
 
 Or with ~use-package~:
 
 #+begin_src emacs-lisp
-(use-package har-viewer)
+(use-package har-viewer
+  :config
+  (har-viewer-global-minor-mode 1))
 #+end_src
 
 ** Manual
@@ -61,26 +69,50 @@ With [[https://github.com/emacs-evil/evil][evil-mode]] the following normal-stat
 | =RET= | Show request and response headers |
 | =yc=  | Copy entry as a cURL command      |
 
+* Headers and Bodies
+
+Pressing =RET= opens a =*HAR Details*= pane showing request and response
+headers.  If [[https://github.com/pashky/restclient.el][restclient]] is installed the pane uses ~restclient-mode~ for
+syntax highlighting automatically.
+
+#+attr_org: :width 800
+[[file:screenshots/request-response-headers.png]]
+
+
+=C-c C-r= shows the response body and =C-c C-p= shows the request body, each in
+a =*HAR Details*= pane set to the appropriate major mode for the content type
+(JSON, HTML, CSS, JavaScript). If [[https://github.com/yasuyk/web-beautify][web-beautify]] is installed, and
+=har-viewer-beautify-bodies= is set to =t=, the source code for JS/TS, CSS,
+HTML, and XML will be automatically beautified in the pane.
+
+#+attr_org: :width 800
+[[file:screenshots/request-response-bodies.png]]
+
 * Copy as cURL
 
-Pressing =C-c c= (or =yc= in evil normal state) copies a shell-ready
+Pressing =C-c C-c= (or =yc= in evil normal state) copies a shell-ready
 cURL invocation for the entry at point to the kill ring.  The command
 includes all request headers and, where present, the request body:
 
-#+begin_example
-curl -X 'POST' \
-  'https://api.example.com/v1/items' \
-  -H 'Content-Type: application/json' \
-  -H 'Authorization: Bearer eyJ...' \
-  --data-raw '{"name":"widget"}'
-#+end_example
+#+begin_src shell
+curl -X 'GET' \
+  'http://192.168.10.1/js/theme.js' \
+  -H 'Host: 192.168.10.1' \
+  -H 'User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:150.0) Gecko/20100101 Firefox/150.0' \
+  -H 'Accept: */*' \
+  -H 'Accept-Language: en-US,en;q=0.9,es-MX;q=0.8' \
+  -H 'Accept-Encoding: gzip, deflate' \
+  -H 'Connection: keep-alive' \
+  -H 'Referer: http://192.168.10.1/' \
+  -H 'Cookie: i18next=en_US'
+#+end_src
 
 Single quotes within header values or body text are shell-escaped
 automatically.
 
 * Filtering
 
-=C-c n= prompts for a regular expression and narrows the list to
+=C-c C-n= prompts for a regular expression and narrows the list to
 entries whose domain + path match it.  Call the command again with a
 new pattern to change the filter, or with an empty string to reset.
 
