@@ -3,9 +3,9 @@
 #+email: bozoslivehere@protonmail.com
 #+language: en
 
-A major mode for viewing HTTP Archive (HAR) files in Emacs.  HAR
-files capture browser network activity and are exported from tools
-such as browser DevTools, Burp Suite, Charles Proxy, and mitmproxy.
+A major mode for viewing HTTP Archive (HAR) files in Emacs. HAR files
+capture browser network activity and are exported from tools such as
+browser DevTools, Burp Suite, Charles Proxy, and mitmproxy.
 ~har-viewer~ renders the request list as a sortable table and provides
 commands to inspect headers, bodies, and copy requests as cURL
 commands.
@@ -39,28 +39,34 @@ Clone the repository and add it to your load path:
 #+begin_src emacs-lisp
 (add-to-list 'load-path "/path/to/har-viewer.el")
 (require 'har-viewer)
+(har-viewer-global-minor-mode 1)
 #+end_src
+
+Enabling ~har-viewer-global-minor-mode~ automatically binds =C-c C-v= in
+any =.har= buffer and prevents ~so-long-mode~ from replacing the buffer
+when files are large.
 
 * Usage
 
-Open a =.har= file in Emacs.  The package automatically binds =C-c v=
-in any =.har= buffer.  Press it to open the viewer:
+Open a =.har= file in Emacs and press =C-c C-v= to open the viewer.
+Alternatively, call ~har-viewer-view~ interactively from any buffer
+containing HAR JSON.
 
-: M-x har-view   (or C-c v from a .har file buffer)
-
-The viewer opens in a separate =*HAR Viewer*= buffer showing all
-requests in a tabulated list.  A =*HAR Details*= pane below the list
-shows header and body output.
+The viewer opens in a =*HAR Viewer*= buffer showing all requests as a
+sortable table.  A =*HAR Details*= pane below shows header and body
+output.
 
 * Keybindings
 
-| Key     | Command                     | Description                       |
-|---------+-----------------------------+-----------------------------------|
-| =RET=   | ~har-display-headers~       | Show request and response headers |
-| =C-c r= | ~har-display-response-body~ | Show response body                |
-| =C-c R= | ~har-display-request-body~  | Show request body                 |
-| =C-c c= | ~har-copy-as-curl~          | Copy entry as a cURL command      |
-| =C-c n= | ~har-narrow-to-regex~       | Filter list by URL regex          |
+Bindings active in the =*HAR Viewer*= buffer:
+
+| Key       | Command                            | Description                       |
+|-----------+------------------------------------+-----------------------------------|
+| =RET=     | ~har-viewer-display-headers~       | Show request and response headers |
+| =C-c C-r= | ~har-viewer-display-response-body~ | Show response body                |
+| =C-c C-p= | ~har-viewer-display-request-body~  | Show request body                 |
+| =C-c C-c= | ~har-viewer-copy-as-curl~          | Copy entry as a cURL command      |
+| =C-c C-n= | ~har-viewer-narrow-to-regex~       | Filter list by URL regex          |
 
 With [[https://github.com/emacs-evil/evil][evil-mode]] the following normal-state bindings are also available:
 
@@ -71,19 +77,20 @@ With [[https://github.com/emacs-evil/evil][evil-mode]] the following normal-stat
 
 * Headers and Bodies
 
-Pressing =RET= opens a =*HAR Details*= pane showing request and response
-headers.  If [[https://github.com/pashky/restclient.el][restclient]] is installed the pane uses ~restclient-mode~ for
-syntax highlighting automatically.
+Pressing =RET= opens a =*HAR Details*= pane showing requesg and
+response headers. If [[https://github.com/pashky/restclient.el][restclient]] is installed the pane uses
+~restclient-mode~ for syntax highlighting automatically.
 
 #+attr_org: :width 800
 [[file:screenshots/request-response-headers.png]]
 
 
-=C-c C-r= shows the response body and =C-c C-p= shows the request body, each in
-a =*HAR Details*= pane set to the appropriate major mode for the content type
-(JSON, HTML, CSS, JavaScript). If [[https://github.com/yasuyk/web-beautify][web-beautify]] is installed, and
-=har-viewer-beautify-bodies= is set to =t=, the source code for JS/TS, CSS,
-HTML, and XML will be automatically beautified in the pane.
+=C-c C-r= shows the response body and =C-c C-p= shows the request
+body, each in a =*HAR Details*= pane set to the appropriate major mode
+for the content type (JSON, HTML, CSS, JavaScript). If [[https://github.com/yasuyk/web-beautify][web-beautify]] is
+installed, and =har-viewer-beautify-bodies= is set to =t=, the source
+code for JS/TS, CSS, HTML, and XML will be automatically beautified in
+the pane.
 
 #+attr_org: :width 800
 [[file:screenshots/request-response-bodies.png]]
@@ -113,7 +120,7 @@ automatically.
 * Filtering
 
 =C-c C-n= prompts for a regular expression and narrows the list to
-entries whose domain + path match it.  Call the command again with a
+entries whose domain + path match it. Call the command again with a
 new pattern to change the filter, or with an empty string to reset.
 
 * Configuration
@@ -132,10 +139,9 @@ Requires Node.js and the =js-beautify= npm package.
 
 ** Header syntax highlighting
 
-Install [[https://github.com/pashky/restclient.el][restclient]] to have header buffers opened in
-~restclient-mode~ for syntax highlighting.  No configuration is
-required; the mode is activated automatically when the package is
-present.
+Install [[https://github.com/pashky/restclient.el][restclient]] to have header buffers opened in ~restclient-mode~
+for syntax highlighting. No configuration is required; the mode is
+activated automatically when the package is present.
 
 * Dependencies
 
