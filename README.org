@@ -15,9 +15,7 @@ commands.
 
 * Installation
 
-** TODO From MELPA
-
-Note: this is pending recipe approval as of this commit.
+** From MELPA
 
 #+begin_src emacs-lisp
 (package-install 'har-viewer)
