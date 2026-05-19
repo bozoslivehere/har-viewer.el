@@ -64,6 +64,16 @@
 (declare-function web-beautify-html-buffer "web-beautify")
 (declare-function web-beautify-css-buffer  "web-beautify")
 
+(defvar har-viewer-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "RET")     #'har-viewer-display-headers)
+    (define-key map (kbd "C-c C-p") #'har-viewer-display-request-body)
+    (define-key map (kbd "C-c C-c") #'har-viewer-copy-as-curl)
+    (define-key map (kbd "C-c C-n") #'har-viewer-narrow-to-regex)
+    (define-key map (kbd "C-c C-r") #'har-viewer-display-response-body)
+    map)
+  "Keymap for `har-viewer-mode'.")
+
 ;;;###autoload
 (define-derived-mode har-viewer-mode tabulated-list-mode "HAR Viewer"
   "Major mode for viewing HTTP Archive (HAR) files."
@@ -77,11 +87,6 @@
                                ("Time" 10 t)])
   (setq tabulated-list-padding 2)
   (tabulated-list-init-header)
-  (define-key har-viewer-mode-map (kbd "RET")   #'har-viewer-display-headers)
-  (define-key har-viewer-mode-map (kbd "C-c C-p") #'har-viewer-display-request-body)
-  (define-key har-viewer-mode-map (kbd "C-c C-c") #'har-viewer-copy-as-curl)
-  (define-key har-viewer-mode-map (kbd "C-c C-n") #'har-viewer-narrow-to-regex)
-  (define-key har-viewer-mode-map (kbd "C-c C-r") #'har-viewer-display-response-body)
   (when (featurep 'evil)
     (evil-define-key 'normal har-viewer-mode-map
       (kbd "RET") #'har-viewer-display-headers
@@ -365,14 +370,18 @@ filter can be changed or cleared by calling this command again."
 
 ;;; Integration hooks
 
+(defvar har-viewer-minor-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "C-c C-v") #'har-viewer-view)
+    map)
+  "Keymap for `har-viewer-minor-mode'.")
+
 ;;;###autoload
 (define-minor-mode har-viewer-minor-mode
   "Minor mode that provides \\[har-viewer-view] in .har file buffers."
   :lighter nil
   :group 'har-viewer
-  :keymap (let ((map (make-sparse-keymap)))
-            (define-key map (kbd "C-c C-v") #'har-viewer-view)
-            map))
+  :keymap har-viewer-minor-mode-map)
 
 (defun har-viewer-minor-mode--maybe-enable ()
   "Enable `har-viewer-minor-mode' when visiting a .har file."
